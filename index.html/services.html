@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neoxis Smart City | City Services</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Search & Filter Bar */
+    .controls-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 32px;
+      align-items: center;
+    }
+
+    .search-box {
+      width: 100%;
+      max-width: 540px;
+      padding: 14px 20px;
+      border-radius: 30px;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      background: rgba(15, 25, 42, 0.8);
+      color: #ffffff;
+      font-size: 15px;
+      outline: none;
+      backdrop-filter: blur(12px);
+    }
+
+    .search-box:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .filter-btn {
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: rgba(15, 25, 42, 0.65);
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: #38bdf8;
+      color: #060d1a;
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+    }
+
+    .service-tag {
+      display: inline-block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      padding: 4px 10px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .service-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .service-card.hidden {
+      display: none;
+    }
+
+    /* Interactive Action Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 13, 26, 0.82);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 200;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 460px;
+      background: #0f192a;
+      border: 1px solid #38bdf8;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 0 35px rgba(56, 189, 248, 0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(6, 13, 26, 0.8);
+      color: #ffffff;
+      font-size: 14px;
+    }
+
+    .modal-feedback {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #34d399;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <a href="dashboard.html" class="logo">
+      <div class="logo-icon">N</div>
+      <div class="logo-text">
+        <h1>NEOXIS</h1>
+        <span>SMART CITY</span>
+      </div>
+    </a>
+
+    <nav>
+      <a href="dashboard.html">Home</a>
+      <a href="services.html" class="active">Services</a>
+      <a href="about.html">About</a>
+      <a href="help.html">Help</a>
+    </nav>
+
+    <div class="header-actions">
+      <span class="citizen-badge" id="userBadge">Citizen</span>
+      <button class="btn-outline" onclick="logout()">Log Out</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+    <section class="hero-banner">
+      <h2>Neoxis Smart City Services</h2>
+      <p>Access real-time transit, smart utilities, public safety tools, and digital citizen requests in one unified hub.</p>
+
+      <!-- Search & Category Filter -->
+      <div class="controls-bar">
+        <input type="text" id="serviceSearch" class="search-box" placeholder="Search services (e.g., EV charging, bill pay, 311, metro)..." onkeyup="filterServices()" />
+        <div class="filter-tabs">
+          <button class="filter-btn active" onclick="setCategory('all', this)">All Services</button>
+          <button class="filter-btn" onclick="setCategory('mobility', this)">Mobility</button>
+          <button class="filter-btn" onclick="setCategory('utilities', this)">Utilities</button>
+          <button class="filter-btn" onclick="setCategory('safety', this)">Safety & Health</button>
+          <button class="filter-btn" onclick="setCategory('governance', this)">Governance</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Grid -->
+    <div class="grid-3" id="servicesGrid">
+      <!-- 1. Mobility -->
+      <div class="glass-card service-card" data-category="mobility">
+        <div>
+          <span class="service-tag">Mobility</span>
+          <div class="card-title">Live Transit & Autonomous Loop</div>
+          <p class="card-desc">Track electric shuttles, metro arrivals, and city bike-share stations with live seat availability.</p>
+        </div>
+        <button class="btn-outline" onclick="openServiceModal('Live Transit Tracker', 'Next Autonomous Pod arrives at Central Plaza in 2 mins (94% battery).')">Check Live Routes</button>
+      </div>
+
+      <!-- 2. Mobility -->
+      <div class="glass-card service-card" data-category="mobility">
+        <div>
+          <span class="service-tag">Mobility</span>
+          <div class="card-title">Smart Parking & EV Charging</div>
+          <p class="card-desc">Find open underground smart parking bays and book ultra-fast 350kW solar EV chargers.</p>
+        </div>
+        <button class="btn-outline" onclick="openServiceModal('Reserve Parking / EV Bay', '42 open bays available in North Hub. Enter your plate number below to reserve.')">Reserve Spot</button>
+      </div>
+
+      <!-- 3. Utilities -->
+      <div class="glass-card service-card" data-category="utilities">
+        <div>
+          <span class="service-tag">Utilities</span>
+          <div class="card-title">One-Click Utility & Fiber Bill Pay</div>
+          <p class="card-desc">View live home solar credits, water usage analytics, and pay your monthly smart-grid bill instantly.</p>
+        </div>
+        <button class="btn-outline" onclick="openServiceModal('Smart Utility Billing', 'Current Balance: $48.50 (Includes -$14.20 Solar Export Credit).')">Pay Bill Now</button>
+      </div>
+
+      <!-- 4. Utilities -->
+      <div class="glass-card service-card" data-category="utilities">
+        <div>
+          <span class="service-tag">Utilities</span>
+          <div class="card-title">Smart Waste & Eco-Rewards</div>
+          <p class="card-desc">Check neighborhood smart-bin capacity, schedule bulk pickups, and redeem recycling points.</p>
+        </div>
+        <button class="btn-outline" onclick="openServiceModal('Eco-Rewards Wallet', 'You currently have 1,240 Green Points ready to redeem for transit credits.')">View Rewards</button>
+      </div>
+
+      <!-- 5. Safety & Health -->
+      <div class="glass-card service-card" data-category="safety">
+        <div>
+          <span class="service-tag">Safety & Health</span>
+          <div class="card-title">Smart Healthcare & Clinic Wait Times</div>
+          <p class="card-desc">Book instant video consultations, check live ER wait times, and locate 24/7 automated pharmacies.</p>
+        </div>
+        <button class="btn-outline" onclick="openServiceModal('Neoxis Health Portal', 'Nearest Clinic: Central Medical Hub (Current Wait Time: 6 mins).')">Book Appointment</button>
+      </div>
+
+      <!-- 6. Safety & Health -->
+      <div class="glass-card service-card" data-category="safety">
+        <div>
+          <span class="service-tag">Safety & Health</span>
+          <div class="card-title">Emergency SOS & Neighborhood Alerts</div>
+          <p class="card-desc">Direct one-tap emergency dispatch with live GPS sharing and severe weather or air quality alerts.</p>
+        </div>
+        <button class="btn-outline" onclick="openServiceModal('Emergency Dispatch Center', 'All emergency response drones and medical units are on standby (Avg response: 2.4 mins).')">Alert Settings</button>
+      </div>
+
+      <!-- 7. Governance -->
+      <div class="glass-card service-card" data-category="governance">
+        <div>
+          <span class="service-tag">Governance</span>
+          <div class="card-title">Report an Issue (311 Smart Request)</div>
+          <p class="card-desc">Report streetlights, sensor maintenance, or park repairs and track automated drone/crew resolution.</p>
+        </div>
+        <button class="btn-outline" onclick="openServiceModal('Submit 311 City Report', 'Describe the issue and district location below for instant dispatch.')">Submit Report</button>
+      </div>
+
+      <!-- 8. Governance -->
+      <div class="glass-card service-card" data-category="governance">
+        <div>
+          <span class="service-tag">Governance</span>
+          <div class="card-title">Digital Citizen ID & Permits</div>
+          <p class="card-desc">Renew resident access passes, business licenses, and smart park facility bookings digitally.</p>
+        </div>
+        <button class="btn-outline" onclick="openServiceModal('Citizen Digital ID', 'Status: Active & Verified • Valid through Dec 2027.')">Manage ID & Permits</button>
+      </div>
+
+      <!-- 9. Mobility / Community -->
+      <div class="glass-card service-card" data-category="mobility">
+        <div>
+          <span class="service-tag">Mobility</span>
+          <div class="card-title">Smart Parks & Co-Working Pods</div>
+          <p class="card-desc">Check live crowd levels at Eco Park and reserve solar-powered outdoor glass co-working pods.</p>
+        </div>
+        <button class="btn-outline" onclick="openServiceModal('Book Smart Pod', '14 climate-controlled pods available at Skybridge Park.')">Reserve Pod</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Interactive Service Popup Modal -->
+  <div class="modal-overlay" id="serviceModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTitle" style="color: #38bdf8;">Service Tool</h3>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <p id="modalDesc" class="card-desc"></p>
+      <input type="text" id="modalInput" class="modal-input" placeholder="Enter details, plate number, or request note..." />
+      <button class="btn-primary" style="width: 100%;" onclick="confirmAction()">Confirm Request</button>
+      <div id="modalFeedback" class="modal-feedback"></div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2026 Neoxis Smart City Portal • Emergency Hotline: 911 • All Rights Reserved.
+  </footer>
+
+  <script>
+    const citizenName = localStorage.getItem('neoxisCitizenName');
+    if (citizenName) {
+      document.getElementById('userBadge').textContent = '👤 ' + citizenName;
+    }
+
+    function logout() {
+      localStorage.removeItem('neoxisCitizenName');
+      localStorage.removeItem('neoxisCitizenEmail');
+      window.location.href = 'index.html';
+    }
+
+    let activeCategory = 'all';
+
+    function setCategory(category, btnElement) {
+      activeCategory = category;
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+      filterServices();
+    }
+
+    function filterServices() {
+      const searchText = document.getElementById('serviceSearch').value.toLowerCase();
+      const cards = document.querySelectorAll('.service-card');
+
+      cards.forEach(card => {
+        const cardCategory = card.getAttribute('data-category');
+        const cardContent = card.textContent.toLowerCase();
+        const matchesCategory = activeCategory === 'all' || cardCategory === activeCategory;
+        const matchesSearch = cardContent.includes(searchText);
+
+        if (matchesCategory && matchesSearch) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function openServiceModal(title, desc) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalDesc').textContent = desc;
+      document.getElementById('modalInput').value = '';
+      document.getElementById('modalFeedback').textContent = '';
+      document.getElementById('serviceModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('serviceModal').classList.remove('open');
+    }
+
+    function confirmAction() {
+      const feedback = document.getElementById('modalFeedback');
+      feedback.textContent = '✓ Request confirmed! Updates sent to your Neoxis Citizen ID.';
+      setTimeout(() => {
+        closeModal();
+      }, 1400);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neoxis Smart City | Citizen Portal</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .auth-wrapper {
+      min-height: calc(100vh - 140px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(15, 25, 42, 0.78);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 24px;
+      padding: 36px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: rgba(6, 13, 26, 0.7);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: #38bdf8;
+      color: #060d1a;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: rgba(6, 13, 26, 0.85);
+      color: #ffffff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: #38bdf8;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 20px 0;
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .divider span {
+      padding: 0 12px;
+    }
+
+    .btn-google {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+
+    .btn-google:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #38bdf8;
+    }
+
+    .error-msg {
+      color: #f87171;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: none;
+      background: rgba(248, 113, 113, 0.1);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <a href="index.html" class="logo">
+      <div class="logo-icon">N</div>
+      <div class="logo-text">
+        <h1>NEOXIS</h1>
+        <span>SMART CITY</span>
+      </div>
+    </a>
+
+    <div class="header-actions">
+      <button class="btn-outline" id="guestBtn">Guest Preview</button>
+    </div>
+  </header>
+
+  <!-- Auth Container -->
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h2 style="font-size: 24px; margin-bottom: 6px;">Citizen Digital ID</h2>
+        <p style="font-size: 13px; color: #94a3b8;">Access Neoxis Smart City services & urban grid</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="tab-btn active" id="loginTab">Sign In</button>
+        <button class="tab-btn" id="signupTab">Create Account</button>
+      </div>
+
+      <div class="error-msg" id="authError"></div>
+
+      <!-- Sign In Form -->
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Citizen Email</label>
+          <input type="email" id="loginEmail" placeholder="citizen@neoxis.city" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 8px;" id="loginSubmitBtn">
+          Access Portal
+        </button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="signupForm" style="display: none;">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="signupName" placeholder="Alex Mercer" required />
+        </div>
+        <div class="form-group">
+          <label>Citizen Email</label>
+          <input type="email" id="signupEmail" placeholder="citizen@neoxis.city" required />
+        </div>
+        <div class="form-group">
+          <label>Create Password (min. 6 characters)</label>
+          <input type="password" id="signupPassword" placeholder="••••••••" minlength="6" required />
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 8px;" id="signupSubmitBtn">
+          Register Citizen ID
+        </button>
+      </form>
+
+      <div class="divider"><span>OR CONTINUE WITH</span></div>
+
+      <!-- Google Sign-In Button -->
+      <button type="button" class="btn-google" id="googleSignInBtn">
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2026 Neoxis Smart City Portal • Secured by Firebase • All Rights Reserved.
+  </footer>
+
+  <!-- Firebase SDK & Auth Integration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-analytics.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword, 
+      updateProfile,
+      GoogleAuthProvider,
+      signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZ7_doQfqO68M39lJ2zKbD9uqd3AVG5us",
+      authDomain: "neoxissmartcity.firebaseapp.com",
+      projectId: "neoxissmartcity",
+      storageBucket: "neoxissmartcity.firebasestorage.app",
+      messagingSenderId: "947163130720",
+      appId: "1:947163130720:web:f0c631c9027c4827e04c05",
+      measurementId: "G-1J4X9PGRLR"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    // UI Elements
+    const loginTab = document.getElementById("loginTab");
+    const signupTab = document.getElementById("signupTab");
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+    const authError = document.getElementById("authError");
+    const guestBtn = document.getElementById("guestBtn");
+    const googleSignInBtn = document.getElementById("googleSignInBtn");
+
+    function showError(message) {
+      authError.textContent = message;
+      authError.style.display = "block";
+    }
+
+    function clearError() {
+      authError.style.display = "none";
+    }
+
+    // Tab Switching
+    loginTab.addEventListener("click", () => {
+      loginTab.classList.add("active");
+      signupTab.classList.remove("active");
+      loginForm.style.display = "block";
+      signupForm.style.display = "none";
+      clearError();
+    });
+
+    signupTab.addEventListener("click", () => {
+      signupTab.classList.add("active");
+      loginTab.classList.remove("active");
+      signupForm.style.display = "block";
+      loginForm.style.display = "none";
+      clearError();
+    });
+
+    // Guest Preview Bypass
+    guestBtn.addEventListener("click", () => {
+      localStorage.setItem("neoxisCitizenName", "Guest Citizen");
+      localStorage.setItem("neoxisCitizenEmail", "guest@neoxis.city");
+      window.location.href = "dashboard.html";
+    });
+
+    // Google Sign-In Popup
+    googleSignInBtn.addEventListener("click", async () => {
+      clearError();
+      googleSignInBtn.disabled = true;
+      googleSignInBtn.style.opacity = "0.7";
+
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        const displayName = user.displayName || user.email.split("@")[0];
+
+        localStorage.setItem("neoxisCitizenName", displayName);
+        localStorage.setItem("neoxisCitizenEmail", user.email);
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        showError(error.message.replace("Firebase: ", ""));
+        googleSignInBtn.disabled = false;
+        googleSignInBtn.style.opacity = "1";
+      }
+    });
+
+    // Firebase Email Sign In
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearError();
+      const btn = document.getElementById("loginSubmitBtn");
+      btn.textContent = "Verifying...";
+      btn.disabled = true;
+
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const displayName = user.displayName || email.split("@")[0];
+
+        localStorage.setItem("neoxisCitizenName", displayName);
+        localStorage.setItem("neoxisCitizenEmail", user.email);
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        showError(error.message.replace("Firebase: ", ""));
+        btn.textContent = "Access Portal";
+        btn.disabled = false;
+      }
+    });
+
+    // Firebase Create Account
+    signupForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearError();
+      const btn = document.getElementById("signupSubmitBtn");
+      btn.textContent = "Creating ID...";
+      btn.disabled = true;
+
+      const name = document.getElementById("signupName").value;
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await updateProfile(userCredential.user, { displayName: name });
+
+        localStorage.setItem("neoxisCitizenName", name);
+        localStorage.setItem("neoxisCitizenEmail", email);
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        showError(error.message.replace("Firebase: ", ""));
+        btn.textContent = "Register Citizen ID";
+        btn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>

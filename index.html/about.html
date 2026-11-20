@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neoxis Smart City | About Our Vision</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .about-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 56px 28px;
+      background: linear-gradient(rgba(6, 13, 26, 0.72), rgba(6, 13, 26, 0.88)),
+                  url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+    }
+
+    .district-card {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 24px;
+      border: 1px solid rgba(56, 189, 248, 0.32);
+      transition: transform 0.25s, border-color 0.25s;
+    }
+
+    .district-card:hover {
+      transform: translateY(-4px);
+      border-color: #38bdf8;
+    }
+
+    .district-badge {
+      display: inline-block;
+      width: fit-content;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #060d1a;
+      background: #38bdf8;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .leader-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    }
+
+    .cta-box {
+      margin-top: 44px;
+      text-align: center;
+      padding: 40px 24px;
+      background: linear-gradient(135deg, rgba(15, 25, 42, 0.85), rgba(14, 116, 144, 0.25));
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      border-radius: 22px;
+    }
+
+    .cta-box h3 {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .cta-box p {
+      color: #cbd5e1;
+      max-width: 580px;
+      margin: 0 auto 22px;
+      font-size: 15px;
+    }
+
+    @media (max-width: 900px) {
+      .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 650px) {
+      .grid-4,
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <a href="dashboard.html" class="logo">
+      <div class="logo-icon">N</div>
+      <div class="logo-text">
+        <h1>NEOXIS</h1>
+        <span>SMART CITY</span>
+      </div>
+    </a>
+
+    <nav>
+      <a href="dashboard.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="about.html" class="active">About</a>
+      <a href="help.html">Help</a>
+    </nav>
+
+    <div class="header-actions">
+      <span class="citizen-badge" id="userBadge">Citizen</span>
+      <button class="btn-outline" onclick="logout()">Log Out</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+    <!-- Hero Banner & City Story -->
+    <section class="hero-banner about-hero">
+      <h2>Engineering the Future of Connected Living</h2>
+      <p>Neoxis Smart City was founded with a single mission: to unite zero-emission architecture, AI-powered infrastructure, and citizen-first digital services into one harmonious urban ecosystem.</p>
+      <div class="hero-buttons">
+        <a href="services.html" class="btn-primary">Explore City Services</a>
+        <a href="help.html" class="btn-outline">Contact City Support</a>
+      </div>
+    </section>
+
+    <!-- Key City Milestones & Numbers -->
+    <h3 class="section-title">Neoxis by the Numbers</h3>
+    <div class="grid-4">
+      <div class="glass-card">
+        <div class="stat-label">Clean Energy</div>
+        <div class="stat-value">100%</div>
+        <div class="stat-sub">● Solar & Micro-Grid Powered</div>
+      </div>
+
+      <div class="glass-card">
+        <div class="stat-label">Public Transit</div>
+        <div class="stat-value">0 Emissions</div>
+        <div class="stat-sub">● Autonomous EV Network</div>
+      </div>
+
+      <div class="glass-card">
+        <div class="stat-label">Connectivity</div>
+        <div class="stat-value">10 Gbps</div>
+        <div class="stat-sub">● City-Wide Fiber & 6G IoT</div>
+      </div>
+
+      <div class="glass-card">
+        <div class="stat-label">Green Footprint</div>
+        <div class="stat-value">48% Parks</div>
+        <div class="stat-sub">● Vertical Gardens & Eco-Zones</div>
+      </div>
+    </div>
+
+    <!-- Core Pillars -->
+    <h3 class="section-title">Core Pillars of Neoxis</h3>
+    <div class="grid-3">
+      <div class="glass-card">
+        <div class="card-title">Sustainability First</div>
+        <p class="card-desc">Every tower harvests solar energy and recycles 92% of greywater through closed-loop bio-filtration, keeping city air cleaner than surrounding forests.</p>
+      </div>
+
+      <div class="glass-card">
+        <div class="card-title">AI & Smart Infrastructure</div>
+        <p class="card-desc">Over 40,000 embedded IoT sensors dynamically balance traffic signals, adaptive street lighting, and power distribution to eliminate congestion and waste.</p>
+      </div>
+
+      <div class="glass-card">
+        <div class="card-title">Citizen-Centered Governance</div>
+        <p class="card-desc">Transparent digital democracy allows residents to propose neighborhood upgrades, track city budgets live, and access public services in seconds.</p>
+      </div>
+    </div>
+
+    <!-- City Districts Overview -->
+    <h3 class="section-title">Explore Our Districts</h3>
+    <div class="grid-2">
+      <div class="district-card" style="background: linear-gradient(rgba(6, 13, 26, 0.35), rgba(6, 13, 26, 0.92)), url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80') center/cover;">
+        <span class="district-badge">District 01</span>
+        <div class="card-title">Innovation & Tech Hub</div>
+        <p class="card-desc" style="margin-bottom: 0;">Home to robotics labs, clean-tech startups, and autonomous transit R&D centers connected by elevated solar skybridges.</p>
+      </div>
+
+      <div class="district-card" style="background: linear-gradient(rgba(6, 13, 26, 0.35), rgba(6, 13, 26, 0.92)), url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=900&q=80') center/cover;">
+        <span class="district-badge">District 02</span>
+        <div class="card-title">Eco-Residential Quarter</div>
+        <p class="card-desc" style="margin-bottom: 0;">Car-free smart neighborhoods featuring vertical forest apartments, underground delivery logistics, and community solar co-ops.</p>
+      </div>
+
+      <div class="district-card" style="background: linear-gradient(rgba(6, 13, 26, 0.35), rgba(6, 13, 26, 0.92)), url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=900&q=80') center/cover;">
+        <span class="district-badge">District 03</span>
+        <div class="card-title">Central Transit Plaza</div>
+        <p class="card-desc" style="margin-bottom: 0;">The multi-level mobility heart of Neoxis, uniting high-speed electric rail, autonomous shuttle loops, and public cultural pavilions.</p>
+      </div>
+
+      <div class="district-card" style="background: linear-gradient(rgba(6, 13, 26, 0.35), rgba(6, 13, 26, 0.92)), url('https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=900&q=80') center/cover;">
+        <span class="district-badge">District 04</span>
+        <div class="card-title">Green Belt & Bio-Parks</div>
+        <p class="card-desc" style="margin-bottom: 0;">Expansive urban nature reserves with smart climate-controlled glass co-working pods, solar trails, and clean-water lagoons.</p>
+      </div>
+    </div>
+
+    <!-- Leadership & Innovation Partners -->
+    <h3 class="section-title">City Leadership & Architecture Team</h3>
+    <div class="grid-3">
+      <div class="glass-card">
+        <div class="leader-avatar">EL</div>
+        <div class="card-title">Dr. Elena Vance</div>
+        <div class="stat-label" style="margin-bottom: 8px;">Chief Urban Architect</div>
+        <p class="card-desc" style="margin-bottom: 0;">Leads Neoxis zero-carbon master planning and vertical-garden structural engineering.</p>
+      </div>
+
+      <div class="glass-card">
+        <div class="leader-avatar">MK</div>
+        <div class="card-title">Marcus Kael</div>
+        <div class="stat-label" style="margin-bottom: 8px;">Director of AI & Smart Grid</div>
+        <p class="card-desc" style="margin-bottom: 0;">Oversees city-wide IoT telemetry, renewable load balancing, and autonomous transit routing.</p>
+      </div>
+
+      <div class="glass-card">
+        <div class="leader-avatar">SR</div>
+        <div class="card-title">Sora Lin</div>
+        <div class="stat-label" style="margin-bottom: 8px;">Head of Citizen Experience</div>
+        <p class="card-desc" style="margin-bottom: 0;">Designs accessible digital governance tools, healthcare portals, and community initiatives.</p>
+      </div>
+    </div>
+
+    <!-- Bottom Call-to-Action -->
+    <section class="cta-box">
+      <h3>Ready to Experience Smart Living?</h3>
+      <p>Access your personalized citizen dashboard, manage utilities, or connect with our 24/7 digital support team.</p>
+      <div class="hero-buttons">
+        <a href="dashboard.html" class="btn-primary">Back to Dashboard</a>
+        <a href="help.html" class="btn-outline">Visit Help Center</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2026 Neoxis Smart City Portal • Emergency Hotline: 911 • All Rights Reserved.
+  </footer>
+
+  <script>
+    const citizenName = localStorage.getItem('neoxisCitizenName');
+    if (citizenName) {
+      document.getElementById('userBadge').textContent = '👤 ' + citizenName;
+    }
+
+    function logout() {
+      localStorage.removeItem('neoxisCitizenName');
+      localStorage.removeItem('neoxisCitizenEmail');
+      window.location.href = 'index.html';
+    }
+  </script>
+
+</body>
+</html>

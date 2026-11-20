@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solara: Neoxis Crisis Command | Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at top center, #0f2942, #060d1a 70%);
+      color: #f8fafc;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 16px 5%;
+      background: rgba(6, 13, 26, 0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #060d1a;
+      font-weight: 800;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    }
+
+    .logo-text h1 {
+      font-size: 18px;
+      letter-spacing: 2px;
+      line-height: 1.1;
+    }
+
+    .logo-text span {
+      font-size: 10px;
+      color: #38bdf8;
+      letter-spacing: 2.5px;
+      font-weight: 600;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: #ffffff;
+    }
+
+    .nav-link.sim-link {
+      color: #38bdf8;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.16);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+    }
+
+    .citizen-badge {
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(15, 25, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      font-size: 13px;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 8px #34d399;
+    }
+
+    /* Game Container */
+    main {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+      flex: 1;
+    }
+
+    /* Top Command HUD */
+    .hud-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-box {
+      background: rgba(15, 25, 42, 0.82);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: 18px;
+      padding: 16px 20px;
+      backdrop-filter: blur(14px);
+    }
+
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 8px;
+      letter-spacing: 0.6px;
+    }
+
+    .stat-num {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .meter-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(6, 13, 26, 0.9);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.45s ease, background 0.3s ease;
+    }
+
+    /* Main Arena Layout */
+    .command-grid {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .command-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: rgba(15, 25, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 24px;
+      padding: 28px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Animated City Visualizer */
+    .city-stage {
+      position: relative;
+      height: 185px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #09192f 0%, #060d1a 100%);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      overflow: hidden;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 0 18px;
+    }
+
+    .solar-orb {
+      position: absolute;
+      top: 18px;
+      right: 26px;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fde047, #f59e0b);
+      box-shadow: 0 0 35px rgba(251, 191, 36, 0.65);
+      transition: all 0.5s ease;
+    }
+
+    .alert-banner {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      background: rgba(248, 113, 113, 0.2);
+      border: 1px solid rgba(248, 113, 113, 0.5);
+      color: #fca5a5;
+      animation: pulseAlert 1.6s infinite;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+
+    .tower {
+      width: 11%;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.35), rgba(15, 25, 42, 0.95));
+      border-top: 2px solid #38bdf8;
+      border-left: 1px solid rgba(56, 189, 248, 0.25);
+      border-right: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 6px 6px 0 0;
+      position: relative;
+      transition: all 0.4s ease;
+    }
+
+    .tower::after {
+      content: "";
+      position: absolute;
+      inset: 10px 6px;
+      background-image: radial-gradient(#38bdf8 1.5px, transparent 1.5px);
+      background-size: 8px 12px;
+      opacity: 0.65;
+    }
+
+    /* Crisis Briefing */
+    .crisis-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .crisis-title {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .crisis-desc {
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+
+    /* Decision Cards */
+    .decisions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .decision-btn {
+      width: 100%;
+      text-align: left;
+      background: rgba(6, 13, 26, 0.82);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 16px;
+      padding: 16px 18px;
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .decision-btn:hover:not(:disabled) {
+      border-color: #38bdf8;
+      background: rgba(14, 34, 62, 0.95);
+      transform: translateX(4px);
+    }
+
+    .decision-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .decision-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #f8fafc;
+    }
+
+    .decision-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+
+    .impact-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .tag-pos {
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.12);
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .tag-neg {
+      color: #f87171;
+      background: rgba(248, 113, 113, 0.12);
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    /* Right Side: Scenario Tracker & Telemetry Log */
+    .stage-dots {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .stage-pill {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.2);
+      transition: background 0.3s;
+    }
+
+    .stage-pill.done {
+      background: #34d399;
+    }
+
+    .stage-pill.active {
+      background: #38bdf8;
+      box-shadow: 0 0 10px #38bdf8;
+    }
+
+    .log-feed {
+      background: rgba(6, 13, 26, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 16px;
+      padding: 16px;
+      height: 310px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .log-entry {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(15, 25, 42, 0.75);
+      border-left: 3px solid #38bdf8;
+      line-height: 1.45;
+    }
+
+    .log-entry.warn {
+      border-left-color: #fbbf24;
+    }
+
+    .log-entry.good {
+      border-left-color: #34d399;
+    }
+
+    .log-entry.bad {
+      border-left-color: #f87171;
+    }
+
+    /* End-Game Modal Overlay */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 8, 18, 0.88);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 200;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 500px;
+      background: rgba(15, 25, 42, 0.95);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      border-radius: 24px;
+      padding: 36px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #060d1a;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 26px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: #64748b;
+      border-top: 1px solid rgba(56, 189, 248, 0.15);
+      background: rgba(6, 13, 26, 0.9);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <a href="dashboard.html" class="logo">
+      <div class="logo-icon">N</div>
+      <div class="logo-text">
+        <h1>NEOXIS</h1>
+        <span>SOLARA COMMAND</span>
+      </div>
+    </a>
+
+    <nav>
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="services.html" class="nav-link">City Services</a>
+      <a href="about.html" class="nav-link">About Neoxis</a>
+      <a href="help.html" class="nav-link">Help & Status</a>
+      <a href="solara-game.html" class="nav-link sim-link">⚡ Solara Sim</a>
+    </nav>
+
+    <div class="citizen-badge">
+      <span class="status-dot"></span>
+      <span>Director: <strong id="directorName">Citizen</strong></span>
+    </div>
+  </header>
+
+  <!-- Main Simulator -->
+  <main>
+
+    <!-- 4 Live City Meters -->
+    <section class="hud-bar">
+      <div class="stat-box">
+        <div class="stat-top"><span>⚡ ENERGY GRID</span><span id="energyVal">75%</span></div>
+        <div class="stat-num" id="energyBig" style="color: #38bdf8;">75%</div>
+        <div class="meter-track"><div class="meter-fill" id="energyBar" style="width: 75%; background: #38bdf8;"></div></div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-top"><span>💧 WATER RESERVES</span><span id="waterVal">75%</span></div>
+        <div class="stat-num" id="waterBig" style="color: #34d399;">75%</div>
+        <div class="meter-track"><div class="meter-fill" id="waterBar" style="width: 75%; background: #34d399;"></div></div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-top"><span>😊 CITIZEN MORALE</span><span id="moraleVal">75%</span></div>
+        <div class="stat-num" id="moraleBig" style="color: #fbbf24;">75%</div>
+        <div class="meter-track"><div class="meter-fill" id="moraleBar" style="width: 75%; background: #fbbf24;"></div></div>
+      </div>
+
+      <div class="stat-box">
+        <div class="stat-top"><span>💰 CITY TREASURY</span><span>CREDITS</span></div>
+        <div class="stat-num" id="budgetBig" style="color: #a78bfa;">$120M</div>
+        <div class="meter-track"><div class="meter-fill" id="budgetBar" style="width: 80%; background: #a78bfa;"></div></div>
+      </div>
+    </section>
+
+    <!-- Command Deck -->
+    <section class="command-grid">
+      
+      <!-- Left: Visual Stage & Active Problem -->
+      <div class="panel">
+        <div class="city-stage" id="cityStage">
+          <div class="alert-banner" id="stageAlert">CRISIS 01 / 06 ACTIVE</div>
+          <div class="solar-orb" id="solarOrb"></div>
+          <div class="tower" style="height: 55%;"></div>
+          <div class="tower" style="height: 82%;"></div>
+          <div class="tower" style="height: 68%;"></div>
+          <div class="tower" style="height: 92%;"></div>
+          <div class="tower" style="height: 60%;"></div>
+          <div class="tower" style="height: 75%;"></div>
+        </div>
+
+        <div id="crisisContainer">
+          <span class="crisis-badge" id="crisisTag">CRISIS 01 • ENERGY GRID</span>
+          <h2 class="crisis-title" id="crisisTitle">Loading Scenario...</h2>
+          <p class="crisis-desc" id="crisisDesc"></p>
+          <div class="decisions-list" id="decisionsList"></div>
+        </div>
+      </div>
+
+      <!-- Right: Mission Progress & Live System Log -->
+      <div class="panel" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 12px; font-weight: 700; color: #94a3b8; letter-spacing: 1px;">SIMULATION PROGRESS</span>
+            <span style="font-size: 13px; font-weight: 700; color: #38bdf8;" id="stageCounter">Crisis 1 of 6</span>
+          </div>
+
+          <div class="stage-dots" id="stageDots">
+            <div class="stage-pill active"></div>
+            <div class="stage-pill"></div>
+            <div class="stage-pill"></div>
+            <div class="stage-pill"></div>
+            <div class="stage-pill"></div>
+            <div class="stage-pill"></div>
+          </div>
+
+          <div style="font-size: 12px; font-weight: 700; color: #94a3b8; letter-spacing: 1px; margin-bottom: 10px;">
+            NEOXIS TELEMETRY LOG
+          </div>
+
+          <div class="log-feed" id="logFeed">
+            <div class="log-entry">Solara Command Deck initialized. All 6 urban sectors reporting live telemetry.</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 18px; display: flex; justify-content: space-between; align-items: center;">
+          <button onclick="resetGame()" style="background: transparent; border: 1px solid rgba(148,163,184,0.3); color: #94a3b8; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600;">
+            ↺ Restart Simulation
+          </button>
+          <a href="dashboard.html" style="color: #38bdf8; text-decoration: none; font-size: 13px; font-weight: 600;">
+            ← Exit to Dashboard
+          </a>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Victory / Failure Modal -->
+  <div class="overlay" id="endOverlay">
+    <div class="modal-card">
+      <div id="endBadge" style="font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #34d399; margin-bottom: 10px;">
+        SIMULATION COMPLETE
+      </div>
+      <h2 id="endTitle" style="font-size: 28px; margin-bottom: 12px;">Neoxis Stabilized!</h2>
+      <p id="endSummary" style="color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 24px;"></p>
+
+      <div style="background: rgba(6, 13, 26, 0.8); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 16px; padding: 16px; margin-bottom: 24px; display: flex; justify-content: space-around;">
+        <div>
+          <div style="font-size: 11px; color: #94a3b8;">FINAL SCORE</div>
+          <div id="finalScore" style="font-size: 24px; font-weight: 800; color: #38bdf8;">0</div>
+        </div>
+        <div>
+          <div style="font-size: 11px; color: #94a3b8;">CITY RATING</div>
+          <div id="finalRank" style="font-size: 24px; font-weight: 800; color: #34d399;">S-TIER</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn-primary" onclick="resetGame()">Play Again</button>
+        <a href="dashboard.html" style="text-decoration: none; padding: 14px 22px; border-radius: 12px; border: 1px solid rgba(56,189,248,0.4); color: #ffffff; font-size: 14px; font-weight: 600;">
+          Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2026 Solara Urban Simulator • Powered by Neoxis Smart City Grid.
+  </footer>
+
+  <script>
+    // Sync Director Name from Login / Dashboard
+    const savedName = localStorage.getItem("neoxisCitizenName") || "Citizen";
+    document.getElementById("directorName").textContent = savedName;
+
+    // 6 Core Urban Crisis Scenarios
+    const scenarios = [
+      {
+        tag: "PROBLEM 01 • ENERGY GRID",
+        color: "#f87171",
+        orbColor: "radial-gradient(circle, #ef4444, #b91c1c)",
+        title: "Peak Heatwave Blackout",
+        desc: "A sudden 46°C heatwave pushes residential cooling demand up 300% while desert dust cuts solar array output in half. How do you stabilize the grid?",
+        choices: [
+          {
+            title: "Discharge Deep-Cycle Battery Reserves & Automated Solar Brush Sweep",
+            sub: "Costs $25M treasury to deploy drone cleaners and tap reserve storage.",
+            energy: +18, water: -5, morale: +10, budget: -25,
+            log: "Drone sweepers cleared solar arrays; battery reserves prevented downtown brownouts."
+          },
+          {
+            title: "Enforce Rolling District Power Caps",
+            sub: "Saves treasury funds and power, but frustrates residents during peak heat.",
+            energy: +12, water: 0, morale: -18, budget: 0,
+            log: "Rolling power caps stabilized grid load, though citizen comfort dropped sharply."
+          },
+          {
+            title: "Overclock Auxiliary Hydro-Turbines",
+            sub: "Draws heavily from city water reservoirs to keep power at 100%.",
+            energy: +20, water: -22, morale: +5, budget: -10,
+            log: "Hydro-turbines held power steady, draining 22% of freshwater reserves."
+          }
+        ]
+      },
+      {
+        tag: "PROBLEM 02 • MOBILITY",
+        color: "#fbbf24",
+        orbColor: "radial-gradient(circle, #fde047, #f59e0b)",
+        title: "Autonomous Transit Gridlock",
+        desc: "An international tech summit causes a massive rush-hour surge, jamming central hyper-shuttle corridors and draining fast-charging EV hubs.",
+        choices: [
+          {
+            title: "Activate AI Dynamic Express Lanes & Off-Peak EV Incentives",
+            sub: "Reroutes autonomous pods smoothly with moderate budget & power use.",
+            energy: -8, water: 0, morale: +15, budget: -20,
+            log: "AI traffic mesh cleared gridlock in 14 minutes; commuters praised transit speed."
+          },
+          {
+            title: "Suspend Heavy Freight & Divert Power to EV Superchargers",
+            sub: "Keeps passenger shuttles moving at the expense of grid reserves.",
+            energy: -18, water: 0, morale: +8, budget: -5,
+            log: "EV superchargers stayed online, placing heavy strain on substation transformers."
+          },
+          {
+            title: "Impose Surge Congestion Tolls",
+            sub: "Generates +$20M revenue and reduces traffic, but angers daily commuters.",
+            energy: +5, water: 0, morale: -16, budget: +20,
+            log: "Congestion tolls raised $20M for the treasury, triggering commuter complaints."
+          }
+        ]
+      },
+      {
+        tag: "PROBLEM 03 • WATER SUPPLY",
+        color: "#38bdf8",
+        orbColor: "radial-gradient(circle, #38bdf8, #0284c7)",
+        title: "Desalination Reservoir Drop",
+        desc: "Scheduled maintenance on Coastal Intake Plant B drops fresh water reserves rapidly across residential and agricultural domes.",
+        choices: [
+          {
+            title: "Boost Closed-Loop Greywater Recycling & Emergency Desalination",
+            sub: "High energy and budget investment to restore water reserves safely.",
+            energy: -14, water: +25, morale: +8, budget: -25,
+            log: "Emergency desalination units ramped up, restoring reservoir capacity safely."
+          },
+          {
+            title: "Pause Vertical Farm Irrigation for 48 Hours",
+            sub: "Conserves water at zero cost, slightly lowering citizen satisfaction.",
+            energy: +4, water: +14, morale: -10, budget: 0,
+            log: "Vertical farm pause saved 14% water reserves without touching the budget."
+          },
+          {
+            title: "Import Emergency Water Tankers via Hyper-Port",
+            sub: "Expensive ($35M) instant refill with zero strain on city power.",
+            energy: 0, water: +22, morale: +12, budget: -35,
+            log: "Hyper-port tankers offloaded fresh reserves, keeping citizen morale high."
+          }
+        ]
+      },
+      {
+        tag: "PROBLEM 04 • ATMOSPHERE",
+        color: "#34d399",
+        orbColor: "radial-gradient(circle, #34d399, #059669)",
+        title: "Industrial Smog Inversion",
+        desc: "Stagnant desert winds trap fine particulates over Sector 4's clean-tech fabrication zone, pushing Air Quality Index into the warning zone.",
+        choices: [
+          {
+            title: "Fire Up Atmospheric Ion Scrubbers & Bio-Algae Towers",
+            sub: "Purifies city air rapidly using solar power and water misting.",
+            energy: -12, water: -10, morale: +16, budget: -15,
+            log: "Ion scrubbers cleared Sector 4 skies in under two hours; AQI back to optimal."
+          },
+          {
+            title: "Temporarily Throttle Fabrication Plant Output",
+            sub: "Cuts emissions cleanly, though industrial tax revenue dips by $15M.",
+            energy: +10, water: +5, morale: +6, budget: -15,
+            log: "Throttled factories reduced smog naturally and freed up 10% grid energy."
+          },
+          {
+            title: "Keep Factories at Full Output & Distribute Smart Masks",
+            sub: "Earns +$25M industrial bonus, but air quality and morale suffer.",
+            energy: -10, water: -5, morale: -20, budget: +25,
+            log: "Full production netted $25M, but smog lingered over residential districts."
+          }
+        ]
+      },
+      {
+        tag: "PROBLEM 05 • CYBER DEFENSE",
+        color: "#a78bfa",
+        orbColor: "radial-gradient(circle, #a78bfa, #6d28d9)",
+        title: "Smart Grid Spoofing Attack",
+        desc: "Rogue packet injections attempt to spoof substation telemetry and trigger cascading circuit breakers across downtown Neoxis.",
+        choices: [
+          {
+            title: "Deploy Quantum Firewall & Air-Gap Core Substations",
+            sub: "Neutralizes the breach cleanly with zero service interruption.",
+            energy: -6, water: 0, morale: +14, budget: -25,
+            log: "Quantum firewall quarantined the rogue packets before any substation tripped."
+          },
+          {
+            title: "Manual Analog Failover Reboot",
+            sub: "Zero cost defense, but causes a brief 15-minute utility dip.",
+            energy: -15, water: -10, morale: -8, budget: 0,
+            log: "Manual failover purged the intrusion; utility meters recovered after reboot."
+          },
+          {
+            title: "Trace & Counter-Hack Botnet Origins",
+            sub: "High-risk cyber operation that recovers stolen municipal credits (+$15M).",
+            energy: -10, water: 0, morale: +5, budget: +15,
+            log: "Cyber defense traced the attacker and seized $15M in frozen escrow funds."
+          }
+        ]
+      },
+      {
+        tag: "PROBLEM 06 • URBAN GROWTH",
+        color: "#f472b6",
+        orbColor: "radial-gradient(circle, #f472b6, #db2777)",
+        title: "Population Boom Overload",
+        desc: "50,000 new citizens arrive in Neoxis ahead of schedule, stretching housing, water, and energy capacity to their limits.",
+        choices: [
+          {
+            title: "Assemble 3D-Printed Modular Eco-Towers & Micro-Grids",
+            sub: "Balanced expansion that welcomes new citizens and boosts long-term tax income.",
+            energy: -10, water: -10, morale: +20, budget: -20,
+            log: "Modular eco-towers housed all new arrivals with integrated rooftop solar."
+          },
+          {
+            title: "Issue Fast-Track Citizen Bonds to Fund Mega-Infrastructure",
+            sub: "Injects +$30M into treasury and expands utilities with slight initial crowding.",
+            energy: +12, water: +12, morale: -6, budget: +30,
+            log: "Citizen bonds raised $30M, funding immediate power and water upgrades."
+          },
+          {
+            title: "Cap New Residency Permits Temporarily",
+            sub: "Protects current resource levels, but hurts Neoxis's open-city reputation.",
+            energy: +8, water: +8, morale: -18, budget: -10,
+            log: "Permit caps stabilized resource consumption at the cost of citizen approval."
+          }
+        ]
+      }
+    ];
+
+    let state = {
+      step: 0,
+      energy: 75,
+      water: 75,
+      morale: 75,
+      budget: 120
+    };
+
+    function clamp(val, min, max) {
+      return Math.max(min, Math.min(max, val));
+    }
+
+    function addLog(text, type = "") {
+      const feed = document.getElementById("logFeed");
+      const entry = document.createElement("div");
+      entry.className = `log-entry ${type}`;
+      const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      entry.innerHTML = `<strong style="color:#38bdf8;">[${time}]</strong> ${text}`;
+      feed.prepend(entry);
+    }
+
+    function updateHUD() {
+      document.getElementById("energyVal").textContent = `${state.energy}%`;
+      document.getElementById("energyBig").textContent = `${state.energy}%`;
+      document.getElementById("energyBar").style.width = `${state.energy}%`;
+      document.getElementById("energyBar").style.background = state.energy < 30 ? "#f87171" : "#38bdf8";
+
+      document.getElementById("waterVal").textContent = `${state.water}%`;
+      document.getElementById("waterBig").textContent = `${state.water}%`;
+      document.getElementById("waterBar").style.width = `${state.water}%`;
+      document.getElementById("waterBar").style.background = state.water < 30 ? "#f87171" : "#34d399";
+
+      document.getElementById("moraleVal").textContent = `${state.morale}%`;
+      document.getElementById("moraleBig").textContent = `${state.morale}%`;
+      document.getElementById("moraleBar").style.width = `${state.morale}%`;
+      document.getElementById("moraleBar").style.background = state.morale < 30 ? "#f87171" : "#fbbf24";
+
+      document.getElementById("budgetBig").textContent = `$${state.budget}M`;
+      const budgetPct = clamp((state.budget / 150) * 100, 0, 100);
+      document.getElementById("budgetBar").style.width = `${budgetPct}%`;
+      document.getElementById("budgetBar").style.background = state.budget < 20 ? "#f87171" : "#a78bfa";
+
+      // Update Stage Dots
+      const pills = document.querySelectorAll(".stage-pill");
+      pills.forEach((pill, idx) => {
+        pill.className = "stage-pill";
+        if (idx < state.step) pill.classList.add("done");
+        else if (idx === state.step) pill.classList.add("active");
+      });
+    }
+
+    function formatImpact(label, val, prefix = "", suffix = "%") {
+      if (val === 0) return "";
+      const sign = val > 0 ? "+" : "";
+      const cls = val > 0 ? "tag-pos" : "tag-neg";
+      return `<span class="${cls}">${label} ${sign}${prefix}${val}${suffix}</span>`;
+    }
+
+    function renderScenario() {
+      const current = scenarios[state.step];
+      document.getElementById("stageCounter").textContent = `Crisis ${state.step + 1} of ${scenarios.length}`;
+      document.getElementById("stageAlert").textContent = `CRISIS 0${state.step + 1} / 06 ACTIVE`;
+
+      const tagEl = document.getElementById("crisisTag");
+      tagEl.textContent = current.tag;
+      tagEl.style.color = current.color;
+      tagEl.style.background = `${current.color}22`;
+      tagEl.style.border = `1px solid ${current.color}66`;
+
+      document.getElementById("solarOrb").style.background = current.orbColor;
+      document.getElementById("crisisTitle").textContent = current.title;
+      document.getElementById("crisisDesc").textContent = current.desc;
+
+      const list = document.getElementById("decisionsList");
+      list.innerHTML = "";
+
+      current.choices.forEach((choice) => {
+        const canAfford = state.budget + choice.budget >= 0;
+        const btn = document.createElement("button");
+        btn.className = "decision-btn";
+        btn.disabled = !canAfford;
+
+        const tagsHTML = [
+          formatImpact("⚡ Energy", choice.energy),
+          formatImpact("💧 Water", choice.water),
+          formatImpact("😊 Morale", choice.morale),
+          choice.budget !== 0
+            ? `<span class="${choice.budget > 0 ? "tag-pos" : "tag-neg"}">💰 Treasury ${choice.budget > 0 ? "+" : "-"}$${Math.abs(choice.budget)}M</span>`
+            : ""
+        ].join("");
+
+        btn.innerHTML = `
+          <div class="decision-title">${choice.title} ${!canAfford ? "(Insufficient Credits)" : ""}</div>
+          <div class="decision-sub">${choice.sub}</div>
+          <div class="impact-tags">${tagsHTML}</div>
+        `;
+
+        btn.onclick = () => makeDecision(choice);
+        list.appendChild(btn);
+      });
+    }
+
+    function makeDecision(choice) {
+      state.energy = clamp(state.energy + choice.energy, 0, 100);
+      state.water = clamp(state.water + choice.water, 0, 100);
+      state.morale = clamp(state.morale + choice.morale, 0, 100);
+      state.budget = Math.max(0, state.budget + choice.budget);
+
+      addLog(choice.log, "good");
+      updateHUD();
+
+      // Check Early Collapse
+      if (state.energy <= 0 || state.water <= 0 || state.morale <= 0) {
+        endSimulation(false);
+        return;
+      }
+
+      state.step++;
+      if (state.step >= scenarios.length) {
+        endSimulation(true);
+      } else {
+        renderScenario();
+      }
+    }
+
+    function endSimulation(survived) {
+      const overlay = document.getElementById("endOverlay");
+      const badge = document.getElementById("endBadge");
+      const title = document.getElementById("endTitle");
+      const summary = document.getElementById("endSummary");
+      const scoreEl = document.getElementById("finalScore");
+      const rankEl = document.getElementById("finalRank");
+
+      const score = (state.energy + state.water + state.morale) * 10 + state.budget * 5;
+      scoreEl.textContent = score.toLocaleString();
+
+      if (!survived) {
+        badge.textContent = "CRITICAL GRID FAILURE";
+        badge.style.color = "#f87171";
+        title.textContent = "Neoxis Systems Offline";
+        summary.textContent = "One of Neoxis City's core life-support meters dropped to 0% during the crisis cascade. Rebalance your resource strategy and try again.";
+        rankEl.textContent = "FAILED";
+        rankEl.style.color = "#f87171";
+        addLog("Simulation halted: critical city meter reached 0%.", "bad");
+      } else {
+        badge.textContent = "ALL 6 CRISES RESOLVED";
+        badge.style.color = "#34d399";
+        title.textContent = "Neoxis Smart City Stabilized!";
+        summary.textContent = `Outstanding leadership, Director ${savedName}. You guided Neoxis through all 6 urban emergencies while keeping power, water, and citizen morale intact.`;
+
+        let rank = "B-TIER";
+        if (score >= 2800) rank = "S+ ARCHITECT";
+        else if (score >= 2300) rank = "A-TIER DIRECTOR";
+        rankEl.textContent = rank;
+        rankEl.style.color = "#34d399";
+        addLog(`All 6 crises cleared! Final Command Score: ${score}.`, "good");
+      }
+
+      overlay.style.display = "flex";
+    }
+
+    function resetGame() {
+      state = {
+        step: 0,
+        energy: 75,
+        water: 75,
+        morale: 75,
+        budget: 120
+      };
+      document.getElementById("endOverlay").style.display = "none";
+      document.getElementById("logFeed").innerHTML =
+        `<div class="log-entry">Simulation rebooted. All city metrics restored to baseline.</div>`;
+      updateHUD();
+      renderScenario();
+    }
+
+    // Start Game
+    updateHUD();
+    renderScenario();
+  </script>
+
+</body>
+</html>
